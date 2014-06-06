@@ -2,4 +2,7 @@
 
 <%= render 'form' %>
 
-<%= link_to 'Back', discussions_path %>
+<% if params[:forum] %>
+  <%= link_to 'Back', forum_path(params[:forum]) %>
+<% end %>
+

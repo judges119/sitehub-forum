@@ -1,0 +1,36 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @forum.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @forum.description %>
+</p>
+
+<% if current_user.try(:admin?) %>
+  <p>
+    <%= link_to 'Edit', edit_forum_path(@forum) %>
+  </p>
+<% end %>
+
+<table>
+  <% for discussion in @forum.discussions %>
+    <tr>
+      <td><%= link_to discussion.title, discussion_path(discussion) %>
+      <td><%= discussion.posts.count - 1 %></td>
+      <td class="right"></td>
+      <% if current_user.try(:admin?) %>
+        <td><%= link_to "Edit", edit_discussion_path(discussion) %></td>
+        <td><%= link_to "Destroy", discussion, :confirm => 'Are you sure?', :method => :delete %></td>
+      <% end %>
+    </tr>
+  <% end %>
+</table>
+
+<p>
+  <%= link_to "New Discussion", "/discussions/new?forum=#{@forum.id}" %>
+</p>
+<%= link_to 'Back', forums_path %>

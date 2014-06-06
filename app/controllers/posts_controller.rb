@@ -1,7 +1,7 @@
 class PostsController < ApplicationController
   before_filter :authenticate_user!, :only => [:new, :edit, :create, :update, :destroy]
   before_action :set_post, only: [:show, :edit, :update, :destroy]
-
+  
   # GET /posts
   # GET /posts.json
   def index
@@ -20,13 +20,16 @@ class PostsController < ApplicationController
 
   # GET /posts/1/edit
   def edit
-    if author_exists = User.where(:user_id => @post.user_id).first
+    if author_exists = User.where(:id => @post.user_id).first
   	  if current_user == author_exists
       else
-        redirect_to discussions_path
+        redirect_to discussion_path(@post.discussion_id)
       end
     else
-      redirect_to discussions_path
+      if current_user.try(:admin?)
+      else
+        redirect_to discussion_path(@post.discussion_id)
+      end
     end
   end
 
@@ -36,7 +39,7 @@ class PostsController < ApplicationController
     @post = Post.new(post_params)
     @post.discussion_id = params[:post][:discussion_id]
     if @post.save
-      redirect_to discussion_url(@post.discussion_id), notice: 'Post was successfully created.'
+      redirect_to discussion_path(@post.discussion_id), notice: 'Post was successfully created.'
     else
       render :new
     end
@@ -47,23 +50,38 @@ class PostsController < ApplicationController
   def update
     if current_user == User.find(@post.user_id)
       if @post.update(post_params)
-        redirect_to discussion_url(@post.discussion_id), notice: 'Post was successfully updated.'
+        redirect_to discussion_path(@post.discussion_id), notice: 'Post was successfully updated.'
       else
         render :edit
       end
     else
-      redirect_to discussion_url(@post.discussion_id)
+      redirect_to discussion_path(@post.discussion_id)
     end
   end
 
   # DELETE /posts/1
   # DELETE /posts/1.json
   def destroy
-    if current_user == User.find(@post.user_id)
-      @post.destroy
-      redirect_to discussions_url, notice: 'Post was successfully destroyed.'
+    discussion = Discussion.where(:id => @post.discussion_id).first
+    if author_exists = User.where(:id => @post.user_id).first
+      if current_user == author_exists
+        @post.destroy
+        redirect_to discussion_path(discussion), notice: 'Post was successfully destroyed.'
+      else
+        if current_user.try(:admin?)
+          @post.destroy
+          redirect_to discussion_path(discussion), notice: 'Post was successfully destroyed.'
+        else
+          redirect_to discussion_path(@post.discussion_id)
+        end
+      end
     else
-      redirect_to discussions_url
+      if current_user.try(:admin?)
+        @post.destroy
+        redirect_to discussion_path(discussion), notice: 'Post was successfully destroyed.'
+      else
+        redirect_to discussion_path(@post.discussion_id)
+      end
     end
   end
 

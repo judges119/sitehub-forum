@@ -1,7 +1,7 @@
 class DiscussionsController < ApplicationController
   before_filter :authenticate_user!, :only => [:new, :edit, :create, :update, :destroy]
   before_action :set_discussion, only: [:show, :edit, :update, :destroy]
-
+  
   # GET /discussions
   # GET /discussions.json
   def index
@@ -20,10 +20,13 @@ class DiscussionsController < ApplicationController
   	if author_exists = User.where(:id => @discussion.user_id).first
   	  if current_user == author_exists
       else
-        redirect_to discussions_path
+        redirect_to discussion_path(@discussion)
       end
     else
-      redirect_to discussions_path
+      if current_user.try(:admin?)
+      else
+        redirect_to discussion_path(@discussion)
+      end
     end
   end
 
@@ -42,7 +45,7 @@ class DiscussionsController < ApplicationController
       @post.discussion_id = @discussion.id
       @post.user_id = @discussion.user_id
       if @post.save
-	    redirect_to @discussion, notice: 'Discussion was successfully created.'
+	    redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully created.'
       else
         render :new
       end
@@ -58,7 +61,7 @@ class DiscussionsController < ApplicationController
       @post = @discussion.posts.first
       if @discussion.update(discussion_params)
         if @post.update(post_params_on_discussion)
-          redirect_to @discussion, notice: 'Discussion was successfully updated.'
+          redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully updated.'
         else
           render :edit
         end
@@ -66,7 +69,7 @@ class DiscussionsController < ApplicationController
         render :edit
       end
     else
-      redirect_to discussions_path
+      redirect_to forum_path(@discussion.forum)
     end
   end
   
@@ -74,11 +77,21 @@ class DiscussionsController < ApplicationController
   # DELETE /discussions/1
   # DELETE /discussions/1.json
   def destroy
-    if current_user == User.find(@discussion.user_id)
-      @discussion.destroy
-      redirect_to discussions_url, notice: 'Discussion was successfully destroyed.'
+    forum = @discussion.forum
+    if author_exists = User.where(:id => @discussion.user_id).first
+      if current_user == author_exists
+        @discussion.destroy
+        redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully destroyed.'
+      else
+        redirect_to forum_path(@discussion.forum)
+      end
     else
-      redirect_to discussions_url
+      if current_user.try(:admin?)
+        @discussion.destroy
+        redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully destroyed.'
+      else
+        redirect_to forum_path(@discussion.forum)
+      end
     end
   end
 
@@ -90,7 +103,7 @@ class DiscussionsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def discussion_params
-      params.require(:discussion).permit(:title, :user_id)
+      params.require(:discussion).permit(:title, :user_id, :forum_id)
     end
     
     def post_params_on_discussion

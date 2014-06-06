@@ -20,5 +20,7 @@
     <%= f.submit %>
   </div>
   
-  <% if params[:discussion] %><input type="hidden" id="discussion_forum_id" name="post[discussion_id]" value="<%= params[:discussion] %>" /><% end %>
+  <% if params[:discussion] %>
+    <input type="hidden" id="discussion_forum_id" name="post[discussion_id]" value="<%= params[:discussion] %>" />
+  <% end %>
 <% end %>

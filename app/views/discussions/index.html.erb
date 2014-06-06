@@ -19,12 +19,12 @@
         <% else %>
           <td>[User Deleted]</td>
         <% end %>
-        <% if discussion.user != nil %>
+        <% if discussion.posts.last.user != nil %>
           <td><%= discussion.posts.last.user.username %></td>
         <% else %>
           <td>[User Deleted]</td>
         <% end %>
-        <% if current_user == discussion.user %>
+        <% if current_user == discussion.user || current_user.try(:admin?) %>
           <td><%= link_to 'Edit', edit_discussion_path(discussion) %></td>
           <td><%= link_to 'Destroy', discussion, method: :delete, data: { confirm: 'Are you sure?' } %></td>
     	<% else %>

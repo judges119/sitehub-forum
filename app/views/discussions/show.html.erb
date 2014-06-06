@@ -1,36 +1,41 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Title:</strong>
-  <%= @discussion.title %>
+  <h1>Title: <%= @discussion.title %></h1>
 </p>
 
 <% for post in @discussion.posts %>
   <div>
-    <% if current_user == post.user && post.user != nil %>
-      User: You!
-      <% if post.id == @discussion.posts.first.id %>
-        <%= link_to "Edit", edit_discussion_path(@discussion) %>
-      <% else %>
-        <%= link_to "Edit", edit_post_path(post) %>
-      <% end %>
-    <% else %>
+    <div>
       <% if post.user != nil %>
-        User: <%= post.user.username %>
+        <% if current_user == post.user && post.user != nil %>
+          User: You!
+        <% else %>
+          <%= post.user.username %>
+        <% end %>
       <% else %>
         [User Deleted]
       <% end %>
-    <% end %>
-  </div>
-  <div>
-    Post: <%= post.content %>
-  </div>
-  <div>
-    
-  </div>
+      <% if current_user == post.user || current_user.try(:admin?) %>
+        <% if post.id == @discussion.posts.first.id %>
+          <%= link_to "Edit Post", edit_discussion_path(@discussion) %>
+          <%= link_to "Destroy Thread", discussion_path(@discussion), method: :delete, data: { confirm: "Are you sure?" } %>
+        <% else %>
+          <%= link_to "Edit Post", edit_post_path(post) %>
+          <%= link_to "Destroy Post", post, method: :delete, data: { confirm: "Are you sure?" } %>
+        <% end %>
+      <% end %>
+    </div>
+    <div>
+      Post:<br />
+      <%= markdown(post.content).html_safe %>
+    </div>
+    <div>
+    </div>
+   </div>
   <br /><br />
 <% end %>
 
 <%= link_to "Reply", "#{new_post_path}?discussion=#{@discussion.id}" %><br />
 
-<%= link_to 'Back', discussions_path %>
+<%= link_to 'Back', forum_path(@discussion.forum) %>
