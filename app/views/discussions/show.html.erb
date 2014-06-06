@@ -1,0 +1,36 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @discussion.title %>
+</p>
+
+<% for post in @discussion.posts %>
+  <div>
+    <% if current_user == post.user && post.user != nil %>
+      User: You!
+      <% if post.id == @discussion.posts.first.id %>
+        <%= link_to "Edit", edit_discussion_path(@discussion) %>
+      <% else %>
+        <%= link_to "Edit", edit_post_path(post) %>
+      <% end %>
+    <% else %>
+      <% if post.user != nil %>
+        User: <%= post.user.username %>
+      <% else %>
+        [User Deleted]
+      <% end %>
+    <% end %>
+  </div>
+  <div>
+    Post: <%= post.content %>
+  </div>
+  <div>
+    
+  </div>
+  <br /><br />
+<% end %>
+
+<%= link_to "Reply", "#{new_post_path}?discussion=#{@discussion.id}" %><br />
+
+<%= link_to 'Back', discussions_path %>

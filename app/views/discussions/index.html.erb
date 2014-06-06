@@ -1,0 +1,40 @@
+<h1>Listing discussions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Creator</th>
+      <th>Last Post</th>
+      <th colspan="2"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @discussions.each do |discussion| %>
+      <tr>
+        <td><%= link_to discussion.title, discussion %></td>
+        <% if discussion.user != nil %>
+          <td><%= discussion.user.username %></td>
+        <% else %>
+          <td>[User Deleted]</td>
+        <% end %>
+        <% if discussion.user != nil %>
+          <td><%= discussion.posts.last.user.username %></td>
+        <% else %>
+          <td>[User Deleted]</td>
+        <% end %>
+        <% if current_user == discussion.user %>
+          <td><%= link_to 'Edit', edit_discussion_path(discussion) %></td>
+          <td><%= link_to 'Destroy', discussion, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    	<% else %>
+    	  <td></td><td></td>
+    	<% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Discussion', new_discussion_path %>
