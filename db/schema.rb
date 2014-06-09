@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140609141303) do
+ActiveRecord::Schema.define(version: 20140609173420) do
 
   create_table "discussions", force: true do |t|
     t.string   "title"
@@ -24,20 +24,6 @@ ActiveRecord::Schema.define(version: 20140609141303) do
   create_table "forums", force: true do |t|
     t.string   "name"
     t.text     "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "groups", force: true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "permissions", force: true do |t|
-    t.integer  "forum_id"
-    t.integer  "group_id"
-    t.boolean  "can_post"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -68,6 +54,7 @@ ActiveRecord::Schema.define(version: 20140609141303) do
     t.boolean  "admin",                  default: false
     t.boolean  "moderator",              default: false
     t.boolean  "banned"
+    t.text     "bio"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true

@@ -54,6 +54,6 @@ class UsersController < ApplicationController
   
   private
     def user_params
-      params.require(:user).permit(:admin, :moderator, :banned)
+      params.require(:user).permit(:admin, :moderator, :banned, :bio)
     end
 end

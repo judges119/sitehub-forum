@@ -4,4 +4,6 @@ class Discussion < ActiveRecord::Base
 	belongs_to :forum
 	
 	validates :title, presence: true
+	validates :user_id, presence: true
+	validates :forum_id, presence: true
 end

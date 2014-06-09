@@ -26,7 +26,10 @@
       BANNED!
     <% end %>
   </p>
-
+  
+  <div><%= f.label :bio %><br />
+  <%= f.text_area :bio %></div>
+  
   <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
     <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
   <% end %>
