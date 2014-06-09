@@ -6,6 +6,8 @@ Rails.application.routes.draw do
 
   resources :discussions
   
+  resources :users
+  
   root 'forums#index'
 
   # The priority is based upon order of creation: first created -> highest priority.

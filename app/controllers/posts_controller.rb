@@ -16,17 +16,20 @@ class PostsController < ApplicationController
   # GET /posts/new
   def new
     @post = Post.new
+    if params[:discussion] == nil
+      redirect_to forums_path
+    end
   end
 
   # GET /posts/1/edit
   def edit
     if author_exists = User.where(:id => @post.user_id).first
-  	  if current_user == author_exists
+  	  if current_user == author_exists || current_user.try(:admin?) || current_user.try(:moderator?)
       else
         redirect_to discussion_path(@post.discussion_id)
       end
     else
-      if current_user.try(:admin?)
+      if current_user.try(:admin?) || current_user.try(:moderator?)
       else
         redirect_to discussion_path(@post.discussion_id)
       end
@@ -37,9 +40,12 @@ class PostsController < ApplicationController
   # POST /posts.json
   def create
     @post = Post.new(post_params)
-    @post.discussion_id = params[:post][:discussion_id]
-    if @post.save
-      redirect_to discussion_path(@post.discussion_id), notice: 'Post was successfully created.'
+    if @post.discussion_id != nil
+      if @post.save
+        redirect_to discussion_path(@post.discussion_id), notice: 'Post was successfully created.'
+      else
+        render :new
+      end
     else
       render :new
     end
@@ -48,7 +54,8 @@ class PostsController < ApplicationController
   # PATCH/PUT /posts/1
   # PATCH/PUT /posts/1.json
   def update
-    if current_user == User.find(@post.user_id)
+    if current_user == User.find(@post.user_id) || current_user.try(:admin?) || current_user.try(:moderator?)
+      @post.edited_by = current_user.id
       if @post.update(post_params)
         redirect_to discussion_path(@post.discussion_id), notice: 'Post was successfully updated.'
       else
@@ -64,16 +71,11 @@ class PostsController < ApplicationController
   def destroy
     discussion = Discussion.where(:id => @post.discussion_id).first
     if author_exists = User.where(:id => @post.user_id).first
-      if current_user == author_exists
+      if current_user == author_exists || current_user.try(:admin?)
         @post.destroy
         redirect_to discussion_path(discussion), notice: 'Post was successfully destroyed.'
       else
-        if current_user.try(:admin?)
-          @post.destroy
-          redirect_to discussion_path(discussion), notice: 'Post was successfully destroyed.'
-        else
-          redirect_to discussion_path(@post.discussion_id)
-        end
+        redirect_to discussion_path(@post.discussion_id)
       end
     else
       if current_user.try(:admin?)
@@ -93,6 +95,6 @@ class PostsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def post_params
-      params.require(:post).permit(:content, :user_id)
+      params.require(:post).permit(:content, :user_id, :discussion_id)
     end
 end

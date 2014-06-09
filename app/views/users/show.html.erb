@@ -1,0 +1,20 @@
+<h1><%= @user.username %></h1>
+<p>
+  <%= @user.email %>
+  <% if @user.admin? %>
+    - ADMIN
+  <% end %>
+  <% if current_user.try(:admin?) %>
+    <%= form_for @user, url: user_path(@user) do |f| %>
+      <p>
+        <%= f.label :admin %>
+        <%= f.check_box(:admin) %>
+      </p>
+      <p>
+        <%= f.label :moderator %>
+        <%= f.check_box(:moderator) %>
+      </p>
+      <%= f.submit %>
+    <% end %>
+  <% end %>
+</p>

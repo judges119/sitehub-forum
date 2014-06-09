@@ -18,12 +18,12 @@ class DiscussionsController < ApplicationController
     @discussion = Discussion.find(params[:id])
   	@post = @discussion.posts.first
   	if author_exists = User.where(:id => @discussion.user_id).first
-  	  if current_user == author_exists
+  	  if current_user == author_exists || current_user.try(:admin?) || current_user.try(:moderator?)
       else
         redirect_to discussion_path(@discussion)
       end
     else
-      if current_user.try(:admin?)
+      if current_user.try(:admin?) || current_user.try(:moderator?)
       else
         redirect_to discussion_path(@discussion)
       end
@@ -57,8 +57,9 @@ class DiscussionsController < ApplicationController
   # PATCH/PUT /discussions/1
   # PATCH/PUT /discussions/1.json
   def update
-    if current_user == User.find(@discussion.user_id)
+    if current_user == User.find(@discussion.user_id) || current_user.try(:admin?) || current_user.try(:moderator?)
       @post = @discussion.posts.first
+      @post.edited_by = current_user.id
       if @discussion.update(discussion_params)
         if @post.update(post_params_on_discussion)
           redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully updated.'
@@ -79,7 +80,7 @@ class DiscussionsController < ApplicationController
   def destroy
     forum = @discussion.forum
     if author_exists = User.where(:id => @discussion.user_id).first
-      if current_user == author_exists
+      if current_user == author_exists || current_user.try(:admin?)
         @discussion.destroy
         redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully destroyed.'
       else

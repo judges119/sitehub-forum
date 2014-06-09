@@ -1,32 +1,34 @@
-<h1>Listing forums</h1>
+<h1>SiteHub - Forums</h1>
 
-<table>
-  <thead>
+<hr />
+
+<table width="100%">
+  <tr>
+    <td width="20%"><strong>Forum</strong></td>
+    <td width="60%"><strong>Description</strong></td>
+    <td colspan="2"  width="20%">
+      <% if current_user.try(:admin?) || current_user.try(:moderator?) %>
+        <strong>Admin</strong>
+      <% end %>
+    </td>
+  </tr>
+
+  <% @forums.each do |forum| %>
     <tr>
-      <th>Forum</th>
-      <th>Description</th>
-      <th colspan="2"></th>
+      <td><%= link_to forum.name, forum %></td>
+      <td><%= forum.description %></td>
+      <% if current_user.try(:admin?) || current_user.try(:moderator?) %>	
+        <td><%= link_to 'Edit', edit_forum_path(forum) %></td>
+      <% end %>
+      <% if current_user.try(:admin?) %>
+        <td><%= link_to 'Delete', forum, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <% end %>
     </tr>
-  </thead>
-
-  <tbody>
-    <% @forums.each do |forum| %>
-      <tr>
-        <td><%= link_to forum.name, forum %></td>
-        <td><%= forum.description %></td>
-        <% if current_user.try(:admin?) %>	
-          <td><%= link_to 'Edit', edit_forum_path(forum) %></td>
-          <td><%= link_to 'Destroy', forum, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-        <% else %>
-          <td></td><td></td>
-        <% end %>
-      </tr>
-    <% end %>
-  </tbody>
+  <% end %>
 </table>
 
-<br>
+<br><br>
 
-<% if current_user.try(:admin?) %>	
+<% if current_user.try(:admin?) || current_user.try(:moderator?) %>	
   <%= link_to 'New Forum', new_forum_path %>
 <% end %>

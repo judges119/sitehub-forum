@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140606062459) do
+ActiveRecord::Schema.define(version: 20140609110024) do
 
   create_table "discussions", force: true do |t|
     t.string   "title"
@@ -28,12 +28,27 @@ ActiveRecord::Schema.define(version: 20140606062459) do
     t.datetime "updated_at"
   end
 
+  create_table "groups", force: true do |t|
+    t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "permissions", force: true do |t|
+    t.integer  "forum_id"
+    t.integer  "group_id"
+    t.boolean  "can_post"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "posts", force: true do |t|
     t.text     "content"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "discussion_id"
     t.integer  "user_id"
+    t.integer  "edited_by_id"
   end
 
   create_table "users", force: true do |t|
@@ -51,6 +66,7 @@ ActiveRecord::Schema.define(version: 20140606062459) do
     t.datetime "updated_at"
     t.string   "username"
     t.boolean  "admin",                  default: false
+    t.boolean  "moderator",              default: false
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true

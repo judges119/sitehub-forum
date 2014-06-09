@@ -1,36 +1,45 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Name:</strong>
-  <%= @forum.name %>
-</p>
+<h1><%= @forum.name %></h1>
 
 <p>
-  <strong>Description:</strong>
   <%= @forum.description %>
+  <% if current_user.try(:admin?) %>
+   <%= link_to 'Edit Name & Description', edit_forum_path(@forum) %>
+  <% end %>
 </p>
 
-<% if current_user.try(:admin?) %>
-  <p>
-    <%= link_to 'Edit', edit_forum_path(@forum) %>
-  </p>
-<% end %>
+<hr />
 
-<table>
+<table width="100%">
+  <tr>
+    <td width="60%"><strong>Discussion</strong></td>
+    <td width="20%"><strong>Posts</strong></td>
+    <td colspan="2"  width="20%">
+      <% if current_user.try(:admin?) || current_user.try(:moderator?) %>
+        <strong>Admin</strong>
+      <% end %>
+    </td>
+  </tr>
+  
   <% for discussion in @forum.discussions %>
     <tr>
       <td><%= link_to discussion.title, discussion_path(discussion) %>
       <td><%= discussion.posts.count - 1 %></td>
-      <td class="right"></td>
-      <% if current_user.try(:admin?) %>
+      <% if current_user == discussion.user || current_user.try(:admin?) || current_user.try(:moderator?) %>
         <td><%= link_to "Edit", edit_discussion_path(discussion) %></td>
-        <td><%= link_to "Destroy", discussion, :confirm => 'Are you sure?', :method => :delete %></td>
+      <% end %>
+      <% if current_user == discussion.user || current_user.try(:admin?) %>
+        <td><%= link_to "Delete", discussion, :confirm => 'Are you sure?', :method => :delete %></td>
       <% end %>
     </tr>
   <% end %>
 </table>
 
+<br><br>
+
 <p>
   <%= link_to "New Discussion", "/discussions/new?forum=#{@forum.id}" %>
 </p>
+
 <%= link_to 'Back', forums_path %>

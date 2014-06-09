@@ -1,8 +1,10 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <h1>Title: <%= @discussion.title %></h1>
+  <h1><%= @discussion.title %></h1>
 </p>
+
+<hr />
 
 <% for post in @discussion.posts %>
   <div>
@@ -16,13 +18,19 @@
       <% else %>
         [User Deleted]
       <% end %>
-      <% if current_user == post.user || current_user.try(:admin?) %>
-        <% if post.id == @discussion.posts.first.id %>
+      <% if post.id == @discussion.posts.first.id %>
+        <% if current_user == post.user || current_user.try(:admin?) || current_user.try(:moderator?) %>
           <%= link_to "Edit Post", edit_discussion_path(@discussion) %>
-          <%= link_to "Destroy Thread", discussion_path(@discussion), method: :delete, data: { confirm: "Are you sure?" } %>
-        <% else %>
+        <% end %>
+        <% if current_user == post.user || current_user.try(:admin?) %>
+          <%= link_to "Delete Thread", discussion_path(@discussion), method: :delete, data: { confirm: "Are you sure?" } %>
+        <% end %>
+      <% else %>
+        <% if current_user == post.user || current_user.try(:admin?) || current_user.try(:moderator?) %>
           <%= link_to "Edit Post", edit_post_path(post) %>
-          <%= link_to "Destroy Post", post, method: :delete, data: { confirm: "Are you sure?" } %>
+        <% end %>
+        <% if current_user == post.user || current_user.try(:admin?) %>
+          <%= link_to "Delete Post", post, method: :delete, data: { confirm: "Are you sure?" } %>
         <% end %>
       <% end %>
     </div>
