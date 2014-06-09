@@ -9,8 +9,12 @@
 <table>
   <% for post in @discussion.posts %>
     <tr>
-      <td><%= image_tag post.user.gravatar_url(:default => "wavatar") %></td>
       <td>
+        <% if post.user != nil %>
+          <%= image_tag post.user.gravatar_url(:default => "wavatar") %>
+        <% end %>
+      </td>
+      <td width="20%">
         <% if post.user != nil %> 
           <% if current_user == post.user && post.user != nil %>
             You!
@@ -44,7 +48,7 @@
           <br>Edited By: <%= post.editor.username %>
         <% end %>
       </td>
-      <td><%= markdown(post.content).html_safe %></td>
+      <td width="70%"><%= markdown(post.content).html_safe %></td>
     </tr>
   <% end %>
 </table>

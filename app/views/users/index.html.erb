@@ -3,8 +3,10 @@
 <table width="100%">
   <tr>
     <td width="30%"><strong>Username</strong></td>
-    <td width="40%"><strong>Email</strong></td>
+    <td width="30%"><strong>Email</strong></td>
     <td width="10%"><strong>Admin</strong></td>
+    <td width="10%"><strong>Moderator</strong></td>
+    <td width="10%"><strong>Banned</strong></td>
     <td colspan="2" width="20%"></td>
   </tr>
 
@@ -14,11 +16,20 @@
       <td><%= user.email %></td>
       <td>
         <% if user.admin? %>
-          ADMIN
+          Yes
         <% end %>
       </td>
-      <% if current_user.try(:admin?) %>	
-        <td><%= link_to 'Edit', edit_user_path(user) %></td>
+      <td>
+        <% if user.moderator? %>
+          Yes
+        <% end %>
+      </td>
+      <td>
+        <% if user.banned? %>
+          Yes
+        <% end %>
+      </td>
+      <% if current_user.try(:admin?) %>
         <td><%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       <% else %>
         <td></td><td></td>
@@ -26,3 +37,7 @@
     </tr>
   <% end %>
 </table>
+
+<p>
+  <%= link_to 'Index', forums_path %>
+</p>

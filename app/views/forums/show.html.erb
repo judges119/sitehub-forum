@@ -26,7 +26,11 @@
   <% for discussion in @forum.discussions %>
     <tr>
       <td><%= link_to discussion.title, discussion_path(discussion) %>
-      <td><%= link_to discussion.user.username, user_path(discussion.user) %>
+        <% if discussion.user != nil %>
+          <td><%= link_to discussion.user.username, user_path(discussion.user) %>
+        <% else %>
+          <td>[Deleted User]</td>
+        <% end %>
       <td><%= discussion.posts.count - 1 %></td>
       <% if !current_user.try(:banned?) %>
         <% if current_user == discussion.user || current_user.try(:admin?) || current_user.try(:moderator?) %>

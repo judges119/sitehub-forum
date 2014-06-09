@@ -9,9 +9,23 @@
   <div><%= f.label :email %><br />
   <%= f.email_field :email %></div>
   
-  <% if current_user.admin? %>
-    ADMIN!
-  <% end %>
+  <p>
+    <% if current_user.admin? %>
+      ADMIN!
+    <% end %>
+  </p>
+  
+  <p>
+    <% if current_user.moderator? %>
+      MODERATOR!
+    <% end %>
+  </p>
+  
+  <p>
+    <% if current_user.banned? %>
+      BANNED!
+    <% end %>
+  </p>
 
   <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
     <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>

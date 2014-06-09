@@ -30,6 +30,20 @@ class UsersController < ApplicationController
     end
   end
   
+  def destroy
+    if current_user.try(:admin?) && !current_user.try(:banned?)
+      @user = User.find(params[:id])
+      if current_user == @user && User.where(:admin => true).count < 2
+        render :show
+      else
+        @user.destroy
+        redirect_to users_path
+      end
+    else
+      render :show
+    end
+  end
+  
   private
     def user_params
       params.require(:user).permit(:admin, :moderator, :banned)
