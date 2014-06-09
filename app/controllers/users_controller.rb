@@ -12,13 +12,21 @@ class UsersController < ApplicationController
   def update
     @user = User.find(params[:id])
     if current_user.try(:admin?)
-      if @user.update(user_params)
-        redirect_to user_path(@user), notice: 'User was successfully updated.'
-      else
+      if current_user == @user && params[:user][:admin] == '0' && User.where(:admin => true).count == 1
         render :show
+      else
+        if params[:user][:admin] == '1' && params[:user][:banned] == '1'
+          render :show
+        else
+          if @user.update(user_params)
+            redirect_to user_path(@user), notice: 'User was successfully updated.'
+          else
+            render :show
+          end
+        end
       end
     else
-      if params[:banned] != nil && current_user.try(:moderator?) && !@user.admin?
+      if params[:user][:banned] == '1' && current_user.try(:moderator?) && !@user.admin?
         if @user.update(user_params)
           redirect_to user_path(@user), notice: 'User was successfully updated.'
         else
@@ -31,7 +39,7 @@ class UsersController < ApplicationController
   end
   
   def destroy
-    if current_user.try(:admin?) && !current_user.try(:banned?)
+    if current_user.try(:admin?)
       @user = User.find(params[:id])
       if current_user == @user && User.where(:admin => true).count < 2
         render :show
