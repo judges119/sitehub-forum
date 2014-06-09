@@ -3,6 +3,9 @@ By Adam O'Grady, [@adamjogrady](https://twitter.com/adamjogrady)
 
 This represents the forum component of the possible future SiteHub project. The current iteration is a very basic forum skeleton, although it is still usable in it's current form as it contains the necessary components. It will be built upon and added to until a full-fledged forum product is created.
 
+### Usage Notes
+First user created will be an administrator role user who has full permissions. The administrator can make other users admins or moderators, the latter share most of the powers but are unable to promote users to these roles and are unable to delete other user's threads/posts, only edit them.
+
 ### MIT License
 Copyright (c) 2014 Adam O'Grady
 

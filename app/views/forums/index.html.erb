@@ -30,5 +30,11 @@
 <br><br>
 
 <% if current_user.try(:admin?) || current_user.try(:moderator?) %>	
-  <%= link_to 'New Forum', new_forum_path %>
+  <p>
+    <%= link_to 'New Forum', new_forum_path %>
+  </p>
 <% end %>
+
+<p>
+  <%= link_to 'Users', users_path %>
+</p>

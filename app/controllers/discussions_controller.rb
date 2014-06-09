@@ -45,7 +45,7 @@ class DiscussionsController < ApplicationController
       @post.discussion_id = @discussion.id
       @post.user_id = @discussion.user_id
       if @post.save
-	    redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully created.'
+	    redirect_to discussion_path(@discussion), notice: 'Discussion was successfully created.'
       else
         render :new
       end
@@ -59,10 +59,10 @@ class DiscussionsController < ApplicationController
   def update
     if current_user == User.find(@discussion.user_id) || current_user.try(:admin?) || current_user.try(:moderator?)
       @post = @discussion.posts.first
-      @post.edited_by = current_user.id
+      @post.edited_by_id = current_user.id
       if @discussion.update(discussion_params)
         if @post.update(post_params_on_discussion)
-          redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully updated.'
+          redirect_to discussion_path(@discussion), notice: 'Discussion was successfully updated.'
         else
           render :edit
         end
@@ -70,7 +70,7 @@ class DiscussionsController < ApplicationController
         render :edit
       end
     else
-      redirect_to forum_path(@discussion.forum)
+      redirect_to discussion_path(@discussion)
     end
   end
   

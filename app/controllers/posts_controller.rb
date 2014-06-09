@@ -55,7 +55,7 @@ class PostsController < ApplicationController
   # PATCH/PUT /posts/1.json
   def update
     if current_user == User.find(@post.user_id) || current_user.try(:admin?) || current_user.try(:moderator?)
-      @post.edited_by = current_user.id
+      @post.edited_by_id = current_user.id
       if @post.update(post_params)
         redirect_to discussion_path(@post.discussion_id), notice: 'Post was successfully updated.'
       else

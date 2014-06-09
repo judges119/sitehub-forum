@@ -13,8 +13,9 @@
 
 <table width="100%">
   <tr>
-    <td width="60%"><strong>Discussion</strong></td>
-    <td width="20%"><strong>Posts</strong></td>
+    <td width="50%"><strong>Discussion</strong></td>
+    <td width="20%"><strong>Author</strong></td>
+    <td width="10%"><strong>Posts</strong></td>
     <td colspan="2"  width="20%">
       <% if current_user.try(:admin?) || current_user.try(:moderator?) %>
         <strong>Admin</strong>
@@ -25,6 +26,7 @@
   <% for discussion in @forum.discussions %>
     <tr>
       <td><%= link_to discussion.title, discussion_path(discussion) %>
+      <td><%= link_to discussion.user.username, user_path(discussion.user) %>
       <td><%= discussion.posts.count - 1 %></td>
       <% if current_user == discussion.user || current_user.try(:admin?) || current_user.try(:moderator?) %>
         <td><%= link_to "Edit", edit_discussion_path(discussion) %></td>

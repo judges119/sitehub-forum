@@ -6,44 +6,49 @@
 
 <hr />
 
-<% for post in @discussion.posts %>
-  <div>
-    <div>
-      <% if post.user != nil %>
-        <% if current_user == post.user && post.user != nil %>
-          User: You!
+<table>
+  <% for post in @discussion.posts %>
+    <tr>
+      <td><%= image_tag post.user.gravatar_url %></td>
+      <td>
+        <% if post.user != nil %> 
+          <% if current_user == post.user && post.user != nil %>
+            You!
+           <% else %>
+            <%= link_to post.user.username, user_path(post.user) %>
+          <% end %>
         <% else %>
-          <%= post.user.username %>
+          [User Deleted]
         <% end %>
-      <% else %>
-        [User Deleted]
-      <% end %>
-      <% if post.id == @discussion.posts.first.id %>
-        <% if current_user == post.user || current_user.try(:admin?) || current_user.try(:moderator?) %>
-          <%= link_to "Edit Post", edit_discussion_path(@discussion) %>
+        <br>
+        <% if post.id == @discussion.posts.first.id %>
+          <% if current_user == post.user || current_user.try(:admin?) || current_user.try(:moderator?) %>
+            <%= link_to "Edit Post", edit_discussion_path(@discussion) %>
+          <% end %>
+          <% if current_user == post.user || current_user.try(:admin?) %>
+            - <%= link_to "Delete Thread", discussion_path(@discussion), method: :delete, data: { confirm: "Are you sure?" } %>
+          <% end %>
+        <% else %>
+          <% if current_user == post.user || current_user.try(:admin?) || current_user.try(:moderator?) %>
+            <%= link_to "Edit Post", edit_post_path(post) %>
+          <% end %>
+          <% if current_user == post.user || current_user.try(:admin?) %>
+            - <%= link_to "Delete Post", post, method: :delete, data: { confirm: "Are you sure?" } %>
+          <% end %>
         <% end %>
-        <% if current_user == post.user || current_user.try(:admin?) %>
-          <%= link_to "Delete Thread", discussion_path(@discussion), method: :delete, data: { confirm: "Are you sure?" } %>
+        <% if post.editor != nil %>
+          <br>Edited By: <%= post.editor.username %>
         <% end %>
-      <% else %>
-        <% if current_user == post.user || current_user.try(:admin?) || current_user.try(:moderator?) %>
-          <%= link_to "Edit Post", edit_post_path(post) %>
-        <% end %>
-        <% if current_user == post.user || current_user.try(:admin?) %>
-          <%= link_to "Delete Post", post, method: :delete, data: { confirm: "Are you sure?" } %>
-        <% end %>
-      <% end %>
-    </div>
-    <div>
-      Post:<br />
-      <%= markdown(post.content).html_safe %>
-    </div>
-    <div>
-    </div>
-   </div>
-  <br /><br />
-<% end %>
+      </td>
+      <td><%= markdown(post.content).html_safe %></td>
+    </tr>
+  <% end %>
+</table>
 
-<%= link_to "Reply", "#{new_post_path}?discussion=#{@discussion.id}" %><br />
+<p>
+  <%= link_to "Reply", "#{new_post_path}?discussion=#{@discussion.id}" %><br />
+</p>
 
-<%= link_to 'Back', forum_path(@discussion.forum) %>
+<p>
+  <%= link_to 'Back', forum_path(@discussion.forum) %>
+</p>
