@@ -4,6 +4,6 @@ class AddModeratorToUsers < ActiveRecord::Migration
   end
   
   def self.down
-    remove_column :users, :admin
+    remove_column :users, :moderator
   end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140609110024) do
+ActiveRecord::Schema.define(version: 20140609141303) do
 
   create_table "discussions", force: true do |t|
     t.string   "title"
@@ -67,6 +67,7 @@ ActiveRecord::Schema.define(version: 20140609110024) do
     t.string   "username"
     t.boolean  "admin",                  default: false
     t.boolean  "moderator",              default: false
+    t.boolean  "banned"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true

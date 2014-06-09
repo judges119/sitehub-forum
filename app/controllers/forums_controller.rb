@@ -17,7 +17,11 @@ class ForumsController < ApplicationController
 
   # GET /forums/new
   def new
-    @forum = Forum.new
+    if current_user.try(:admin?) || current_user.try(:moderator?)
+      @forum = Forum.new
+    else
+      render :index
+    end
   end
 
   # GET /forums/1/edit
@@ -27,40 +31,40 @@ class ForumsController < ApplicationController
   # POST /forums
   # POST /forums.json
   def create
-    @forum = Forum.new(forum_params)
-
-    respond_to do |format|
+    if current_user.try(:admin?) || current_user.try(:moderator?)
+      @forum = Forum.new(forum_params)
       if @forum.save
-        format.html { redirect_to @forum, notice: 'Forum was successfully created.' }
-        format.json { render :show, status: :created, location: @forum }
+        redirect_to @forum, notice: 'Forum was successfully created.'
       else
-        format.html { render :new }
-        format.json { render json: @forum.errors, status: :unprocessable_entity }
+        render :new
       end
+    else
+      render :index
     end
   end
 
   # PATCH/PUT /forums/1
   # PATCH/PUT /forums/1.json
   def update
-    respond_to do |format|
+    if current_user.try(:admin?) || current_user.try(:moderator?)
       if @forum.update(forum_params)
-        format.html { redirect_to @forum, notice: 'Forum was successfully updated.' }
-        format.json { render :show, status: :ok, location: @forum }
+        redirect_to @forum, notice: 'Forum was successfully updated.'
       else
-        format.html { render :edit }
-        format.json { render json: @forum.errors, status: :unprocessable_entity }
+        render :edit
       end
+    else
+      render :index
     end
   end
 
   # DELETE /forums/1
   # DELETE /forums/1.json
   def destroy
-    @forum.destroy
-    respond_to do |format|
-      format.html { redirect_to forums_url, notice: 'Forum was successfully destroyed.' }
-      format.json { head :no_content }
+    if current_user.try(:admin?)
+      @forum.destroy
+      redirect_to forums_url, notice: 'Forum was successfully destroyed.'
+    else
+      render :index
     end
   end
 

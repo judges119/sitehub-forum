@@ -4,17 +4,36 @@
   <% if @user.admin? %>
     - ADMIN
   <% end %>
-  <% if current_user.try(:admin?) %>
-    <%= form_for @user, url: user_path(@user) do |f| %>
-      <p>
-        <%= f.label :admin %>
-        <%= f.check_box(:admin) %>
-      </p>
-      <p>
-        <%= f.label :moderator %>
-        <%= f.check_box(:moderator) %>
-      </p>
-      <%= f.submit %>
+  <% if !current_user.try(:banned?) %>
+    <% if current_user.try(:admin?) %>
+      <%= form_for @user, url: user_path(@user) do |f| %>
+        <p>
+          <%= f.label :admin %>
+          <%= f.check_box(:admin) %>
+        </p>
+        <p>
+          <%= f.label :moderator %>
+          <%= f.check_box(:moderator) %>
+        </p>
+        <% if current_user != @user %>  
+          <p>
+            <%= f.label :banned %>
+            <%= f.check_box(:banned) %>
+          </p>
+        <% end %>
+        <%= f.submit %>
+      <% end %>
+    <% end %>
+    <% if current_user.try(:moderator?) %>
+      <% if !@user.admin? && !@user.moderator? && current_user != @user %>
+        <%= form_for @user, url: user_path(@user) do |f| %>
+          <p>
+            <%= f.label :banned %>
+            <%= f.check_box(:banned) %>
+          </p>
+          <%= f.submit %>
+        <% end %>
+      <% end %>
     <% end %>
   <% end %>
 </p>

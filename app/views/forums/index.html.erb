@@ -17,11 +17,13 @@
     <tr>
       <td><%= link_to forum.name, forum %></td>
       <td><%= forum.description %></td>
-      <% if current_user.try(:admin?) || current_user.try(:moderator?) %>	
-        <td><%= link_to 'Edit', edit_forum_path(forum) %></td>
-      <% end %>
-      <% if current_user.try(:admin?) %>
-        <td><%= link_to 'Delete', forum, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <% if !current_user.try(:banned?) %>  
+        <% if current_user.try(:admin?) || current_user.try(:moderator?) %>	
+          <td><%= link_to 'Edit', edit_forum_path(forum) %></td>
+        <% end %>
+        <% if current_user.try(:admin?) %>
+          <td><%= link_to 'Delete', forum, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <% end %>
       <% end %>
     </tr>
   <% end %>
@@ -29,10 +31,12 @@
 
 <br><br>
 
-<% if current_user.try(:admin?) || current_user.try(:moderator?) %>	
-  <p>
-    <%= link_to 'New Forum', new_forum_path %>
-  </p>
+<% if !current_user.try(:banned?) %>
+  <% if current_user.try(:admin?) || current_user.try(:moderator?) %>	
+    <p>
+      <%= link_to 'New Forum', new_forum_path %>
+    </p>
+  <% end %>
 <% end %>
 
 <p>

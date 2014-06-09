@@ -15,62 +15,82 @@ class DiscussionsController < ApplicationController
   
   # GET /discussions/1/edit
   def edit
-    @discussion = Discussion.find(params[:id])
-  	@post = @discussion.posts.first
-  	if author_exists = User.where(:id => @discussion.user_id).first
-  	  if current_user == author_exists || current_user.try(:admin?) || current_user.try(:moderator?)
+    if current_user != nil && !current_user.try(:banned?)
+      @discussion = Discussion.find(params[:id])
+      @post = @discussion.posts.first
+  	  if author_exists = User.where(:id => @discussion.user_id).first
+  	    if current_user == author_exists || current_user.try(:admin?) || current_user.try(:moderator?)
+        else
+          redirect_to discussion_path(@discussion)
+        end
       else
-        redirect_to discussion_path(@discussion)
+        if current_user.try(:admin?) || current_user.try(:moderator?)
+        else
+          redirect_to discussion_path(@discussion)
+        end
       end
     else
-      if current_user.try(:admin?) || current_user.try(:moderator?)
-      else
-        redirect_to discussion_path(@discussion)
-      end
+      redirect_to discussion_path(params[:id])
     end
   end
 
   # GET /discussions/new
   def new
-    @discussion = Discussion.new
-    @post = Post.new
+    if params[:forum]
+      if current_user != nil && !current_user.try(:banned?)
+        @discussion = Discussion.new
+        @post = Post.new
+      else
+        redirect_to forum_path(params[:forum])
+      end
+    else
+      redirect_to forums_path
+    end
   end
 
   # POST /discussions
   # POST /discussions.json
   def create
-    @discussion = Discussion.new(discussion_params)
-    @post = Post.new(post_params_on_discussion)
-    if @discussion.save
-      @post.discussion_id = @discussion.id
-      @post.user_id = @discussion.user_id
-      if @post.save
-	    redirect_to discussion_path(@discussion), notice: 'Discussion was successfully created.'
+    if current_user != nil && !current_user.try(:banned?)
+      @discussion = Discussion.new(discussion_params)
+      @post = Post.new(post_params_on_discussion)
+      if @discussion.save
+        @post.discussion_id = @discussion.id
+        @post.user_id = @discussion.user_id
+        if @post.save
+	      redirect_to discussion_path(@discussion), notice: 'Discussion was successfully created.'
+        else
+          render :new
+        end
       else
         render :new
       end
     else
-      render :new
+      redirect_to forum_path(@discussion.forum_id)
     end
   end
 
   # PATCH/PUT /discussions/1
   # PATCH/PUT /discussions/1.json
   def update
-    if current_user == User.find(@discussion.user_id) || current_user.try(:admin?) || current_user.try(:moderator?)
-      @post = @discussion.posts.first
-      @post.edited_by_id = current_user.id
-      if @discussion.update(discussion_params)
-        if @post.update(post_params_on_discussion)
-          redirect_to discussion_path(@discussion), notice: 'Discussion was successfully updated.'
+    if current_user != nil && !current_user.try(:banned?)
+      if current_user == User.find(@discussion.user_id) || current_user.try(:admin?) || current_user.try(:moderator?)
+        @post = @discussion.posts.first
+        @post.edited_by_id = current_user.id
+        if @discussion.update(discussion_params)
+          if @post.update(post_params_on_discussion)
+            redirect_to discussion_path(@discussion), notice: 'Discussion was successfully updated.'
+          else
+            render :edit
+          end
         else
           render :edit
         end
       else
-        render :edit
+        redirect_to discussion_path(@discussion)
       end
     else
-      redirect_to discussion_path(@discussion)
+      render forum_path(@discussion.forum_id)
     end
   end
   
@@ -78,21 +98,25 @@ class DiscussionsController < ApplicationController
   # DELETE /discussions/1
   # DELETE /discussions/1.json
   def destroy
-    forum = @discussion.forum
-    if author_exists = User.where(:id => @discussion.user_id).first
-      if current_user == author_exists || current_user.try(:admin?)
-        @discussion.destroy
-        redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully destroyed.'
+    if current_user != nil && !current_user.try(:banned?)
+      forum = @discussion.forum
+      if author_exists = User.where(:id => @discussion.user_id).first
+        if current_user == author_exists || current_user.try(:admin?)
+          @discussion.destroy
+          redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully destroyed.'
+        else
+          redirect_to forum_path(@discussion.forum)
+        end
       else
-        redirect_to forum_path(@discussion.forum)
+        if current_user.try(:admin?)
+          @discussion.destroy
+          redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully destroyed.'
+        else
+          redirect_to forum_path(@discussion.forum)
+        end
       end
     else
-      if current_user.try(:admin?)
-        @discussion.destroy
-        redirect_to forum_path(@discussion.forum), notice: 'Discussion was successfully destroyed.'
-      else
-        redirect_to forum_path(@discussion.forum)
-      end
+      render forum_path(@discussion.forum_id)
     end
   end
 
